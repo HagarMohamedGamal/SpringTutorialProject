@@ -14,19 +14,22 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	UserRepository userRepository;
-	
+
 	@Override
 	public UserDto createUser(UserDto userDto) {
+		if (userRepository.findByEmail(userDto.getEmail()) != null)
+			throw new RuntimeException("Record already exists");
+
 		UserEntity userEntity = new UserEntity();
 		BeanUtils.copyProperties(userDto, userEntity);
 		userEntity.setEncryptedPassword("test");
 		userEntity.setUserId("testUserId");
-		
+
 		UserEntity storedUserDetails = userRepository.save(userEntity);
-		
+
 		UserDto returnValue = new UserDto();
 		BeanUtils.copyProperties(storedUserDetails, returnValue);
-		
+
 		return returnValue;
 	}
 
