@@ -2,6 +2,7 @@ package com.springtutorialproject.service.impl;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.springtutorialproject.entities.UserEntity;
@@ -19,6 +20,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	Utils utils;
 
+	@Autowired
+	BCryptPasswordEncoder bCryptPasswordEncoder;
+
 	@Override
 	public UserDto createUser(UserDto userDto) {
 		if (userRepository.findByEmail(userDto.getEmail()) != null)
@@ -27,7 +31,7 @@ public class UserServiceImpl implements UserService {
 		UserEntity userEntity = new UserEntity();
 		BeanUtils.copyProperties(userDto, userEntity);
 		
-		userEntity.setEncryptedPassword("test");
+		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
 		
 		String publicUserId = utils.generateRandomString(30);
 		userEntity.setUserId(publicUserId);
