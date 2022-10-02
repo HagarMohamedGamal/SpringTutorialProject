@@ -17,6 +17,9 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.springtutorialproject.SpringApplicationContext;
+import com.springtutorialproject.service.UserService;
+import com.springtutorialproject.shared.dto.UserDto;
 import com.springtutorialproject.ui.model.request.UserLoginRequestModel;
 
 import io.jsonwebtoken.Jwts;
@@ -56,8 +59,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 				.setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
 				.signWith(Keys.hmacShaKeyFor(SecurityConstants.TOKEN_SECRET.getBytes()), SignatureAlgorithm.HS512)
 				.compact();
-		
+		UserService userService = (UserService)SpringApplicationContext.getBean("userServiceImpl");
+		UserDto userDto = userService.getUser(userName);
 		response.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
+		response.addHeader("UserID", userDto.getUserId());
 	}
 
 }
