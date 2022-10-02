@@ -20,32 +20,34 @@ public class WebSecurity {
 		this.userService = userService;
 		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 	}
-/*
- * UthenticationManager object is used to configure which service class in our app will be responsible to load user details from database
- * And when user login, Spring will use this class to see if our database have a user with the provided credentials
- * */
+
+	/*
+	 * UthenticationManager object is used to configure which service class in our
+	 * app will be responsible to load user details from database And when user
+	 * login, Spring will use this class to see if our database have a user with the
+	 * provided credentials
+	 */
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		AuthenticationManagerBuilder authenticationManagerBuilder = http
 				.getSharedObject(AuthenticationManagerBuilder.class);
-		authenticationManagerBuilder
-		.userDetailsService(userService)
-		.passwordEncoder(bCryptPasswordEncoder);
+		authenticationManagerBuilder.userDetailsService(userService).passwordEncoder(bCryptPasswordEncoder);
 		AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
 		http.authenticationManager(authenticationManager);
 //		AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManagerBuilder.class).getOrBuild();
 		http.csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, SecurityConstants.SING_UP_URL)
 				.permitAll().anyRequest().authenticated().and()
-				.addFilter(getAuthenticationFilter(authenticationManager));
+				.addFilter(getAuthenticationFilter(authenticationManager))
+				.addFilter(new AuthorizationFilter(authenticationManager));
 		return http.build();
 	}
-	
+
 	public AuthenticationFilter getAuthenticationFilter(AuthenticationManager authenticationManager) {
 		AuthenticationFilter filter = new AuthenticationFilter(authenticationManager);
 		filter.setFilterProcessesUrl("/users/login");
 		return filter;
 	}
-	
+
 //
 //	@Bean
 //	public WebSecurityCustomizer webSecurityCustomizer() {
