@@ -36,9 +36,16 @@ public class WebSecurity {
 //		AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManagerBuilder.class).getOrBuild();
 		http.csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, SecurityConstants.SING_UP_URL)
 				.permitAll().anyRequest().authenticated().and()
-				.addFilter(new AuthenticationFilter(authenticationManager));
+				.addFilter(getAuthenticationFilter(authenticationManager));
 		return http.build();
 	}
+	
+	public AuthenticationFilter getAuthenticationFilter(AuthenticationManager authenticationManager) {
+		AuthenticationFilter filter = new AuthenticationFilter(authenticationManager);
+		filter.setFilterProcessesUrl("/users/login");
+		return filter;
+	}
+	
 //
 //	@Bean
 //	public WebSecurityCustomizer webSecurityCustomizer() {
