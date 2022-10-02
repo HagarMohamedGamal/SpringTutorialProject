@@ -16,5 +16,10 @@ public class SpringTutorialProjectApplication {
 	BCryptPasswordEncoder getBCryptPasswordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+	
+	@Bean
+	SpringApplicationContext getSpringApplicationContext() {
+		return new SpringApplicationContext();
+	}
 
 }
