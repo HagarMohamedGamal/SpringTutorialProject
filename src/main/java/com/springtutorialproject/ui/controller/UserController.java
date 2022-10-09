@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.springtutorialproject.service.UserService;
 import com.springtutorialproject.shared.dto.UserDto;
+import com.springtutorialproject.ui.model.request.RequestOperationName;
 import com.springtutorialproject.ui.model.request.UserDetailsRequestModel;
+import com.springtutorialproject.ui.model.response.OperationStatusModel;
+import com.springtutorialproject.ui.model.response.RequestOperationStatus;
 import com.springtutorialproject.ui.model.response.UserRest;
 
 @RestController	//to be able to accept http requests
@@ -51,9 +54,13 @@ public class UserController {
 		return "update user was called";
 	}
 
-	@DeleteMapping
-	public String deleteUser() {
-		return "delete user was called";
+	@DeleteMapping(path = "/{userId}")
+	public OperationStatusModel deleteUser(@PathVariable String userId) {
+		OperationStatusModel returnValue = new OperationStatusModel();
+		returnValue.setOperationName(RequestOperationName.DELETE.name());
+		userService.deleteUser(userId);
+		returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+		return returnValue;
 	}
 	
 }
