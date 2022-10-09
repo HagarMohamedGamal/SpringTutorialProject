@@ -35,9 +35,9 @@ public class UserServiceImpl implements UserService {
 
 		UserEntity userEntity = new UserEntity();
 		BeanUtils.copyProperties(userDto, userEntity);
-		
+
 		userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
-		
+
 		String publicUserId = utils.generateRandomString(30);
 		userEntity.setUserId(publicUserId);
 
@@ -52,9 +52,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDto getUser(String email) {
 		UserEntity userEntity = userRepository.findByEmail(email);
-		
-		if(userEntity == null) throw new UsernameNotFoundException(email);
-		
+
+		if (userEntity == null)
+			throw new UsernameNotFoundException(email);
+
 		UserDto returnValue = new UserDto();
 		BeanUtils.copyProperties(userEntity, returnValue);
 		return returnValue;
@@ -63,16 +64,18 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		UserEntity userEntity = userRepository.findByEmail(email);
-		
-		if(userEntity == null) throw new UsernameNotFoundException(email);
-		
+
+		if (userEntity == null)
+			throw new UsernameNotFoundException(email);
+
 		return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>());
 	}
 
 	@Override
 	public UserDto findUserByUserId(String userId) {
-		UserEntity userEntity = userRepository.findByUserId(userId);		
-		if(userEntity == null) throw new UsernameNotFoundException(userId);
+		UserEntity userEntity = userRepository.findByUserId(userId);
+		if (userEntity == null)
+			throw new UsernameNotFoundException(userId);
 
 		UserDto userDto = new UserDto();
 		BeanUtils.copyProperties(userEntity, userDto);
@@ -81,10 +84,29 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void deleteUser(String userId) {
-		UserEntity userEntity = userRepository.findByUserId(userId);		
-		if(userEntity == null) throw new UsernameNotFoundException(userId);
-		
+		UserEntity userEntity = userRepository.findByUserId(userId);
+		if (userEntity == null)
+			throw new UsernameNotFoundException(userId);
+
 		userRepository.delete(userEntity);
+	}
+
+	@Override
+	public UserDto updateUser(String userId, UserDto userDto) {
+		UserEntity userEntity = userRepository.findByUserId(userId);
+		if (userEntity == null)
+			throw new UsernameNotFoundException(userId);
+
+		if (userDto.getFirstName()!=null && !userDto.getFirstName().isEmpty())
+			userEntity.setFirstName(userDto.getFirstName());
+
+		if (userDto.getLastName()!=null && !userDto.getLastName().isEmpty())
+			userEntity.setLastName(userDto.getLastName());
+
+		userEntity = userRepository.save(userEntity);
+		UserDto returnValue = new UserDto();
+		BeanUtils.copyProperties(userEntity, returnValue);
+		return returnValue;
 	}
 
 }

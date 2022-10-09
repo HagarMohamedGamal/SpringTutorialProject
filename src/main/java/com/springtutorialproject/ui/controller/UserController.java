@@ -15,6 +15,7 @@ import com.springtutorialproject.service.UserService;
 import com.springtutorialproject.shared.dto.UserDto;
 import com.springtutorialproject.ui.model.request.RequestOperationName;
 import com.springtutorialproject.ui.model.request.UserDetailsRequestModel;
+import com.springtutorialproject.ui.model.request.UserLoginRequestModel;
 import com.springtutorialproject.ui.model.response.OperationStatusModel;
 import com.springtutorialproject.ui.model.response.RequestOperationStatus;
 import com.springtutorialproject.ui.model.response.UserRest;
@@ -49,11 +50,18 @@ public class UserController {
 		return returnValue;
 	}
 
-	@PutMapping
-	public String updateUser() {
-		return "update user was called";
+	@PutMapping(path = "/{userId}")
+	public UserRest updateUser(@PathVariable String userId, @RequestBody UserDetailsRequestModel userDetails) {
+		UserDto userDto = new UserDto();
+		BeanUtils.copyProperties(userDetails, userDto);
+		
+		userDto = userService.updateUser(userId, userDto);
+		
+		UserRest returnValue = new UserRest();
+		BeanUtils.copyProperties(userDto, returnValue);
+		
+		return returnValue;
 	}
-
 	@DeleteMapping(path = "/{userId}")
 	public OperationStatusModel deleteUser(@PathVariable String userId) {
 		OperationStatusModel returnValue = new OperationStatusModel();
