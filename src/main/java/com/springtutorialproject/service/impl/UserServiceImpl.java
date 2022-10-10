@@ -11,10 +11,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.springtutorialproject.entities.UserEntity;
+import com.springtutorialproject.exceptions.UserServiceException;
 import com.springtutorialproject.repository.UserRepository;
 import com.springtutorialproject.service.UserService;
 import com.springtutorialproject.shared.Utils;
 import com.springtutorialproject.shared.dto.UserDto;
+import com.springtutorialproject.ui.model.response.ErrorMessagesEnum;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -30,8 +32,14 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserDto createUser(UserDto userDto) {
+		if(userDto.getEmail() == null || userDto.getEmail().isEmpty()
+				|| userDto.getFirstName() == null || userDto.getFirstName().isEmpty()
+						|| userDto.getLastName() == null || userDto.getLastName().isEmpty()
+								|| userDto.getPassword() == null || userDto.getPassword().isEmpty()) {
+			throw new UserServiceException(ErrorMessagesEnum.MISSING_REQUIRED_FIELD.getErrorMessage());
+		}
 		if (userRepository.findByEmail(userDto.getEmail()) != null)
-			throw new RuntimeException("Record already exists");
+			throw new RuntimeException(ErrorMessagesEnum.RECORD_ALREADY_EXISTS.getErrorMessage());
 
 		UserEntity userEntity = new UserEntity();
 		BeanUtils.copyProperties(userDto, userEntity);
