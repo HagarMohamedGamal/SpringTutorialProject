@@ -15,7 +15,6 @@ import com.springtutorialproject.service.UserService;
 import com.springtutorialproject.shared.dto.UserDto;
 import com.springtutorialproject.ui.model.request.RequestOperationName;
 import com.springtutorialproject.ui.model.request.UserDetailsRequestModel;
-import com.springtutorialproject.ui.model.request.UserLoginRequestModel;
 import com.springtutorialproject.ui.model.response.OperationStatusModel;
 import com.springtutorialproject.ui.model.response.RequestOperationStatus;
 import com.springtutorialproject.ui.model.response.UserRest;

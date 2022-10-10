@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
 			throw new UserServiceException(ErrorMessagesEnum.MISSING_REQUIRED_FIELD.getErrorMessage());
 		}
 		if (userRepository.findByEmail(userDto.getEmail()) != null)
-			throw new RuntimeException(ErrorMessagesEnum.RECORD_ALREADY_EXISTS.getErrorMessage());
+			throw new UserServiceException(ErrorMessagesEnum.RECORD_ALREADY_EXISTS.getErrorMessage());
 
 		UserEntity userEntity = new UserEntity();
 		BeanUtils.copyProperties(userDto, userEntity);
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
 	public UserDto findUserByUserId(String userId) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
 		if (userEntity == null)
-			throw new UsernameNotFoundException(userId);
+			throw new UserServiceException(ErrorMessagesEnum.NO_RECORD_FOUND.getErrorMessage());
 
 		UserDto userDto = new UserDto();
 		BeanUtils.copyProperties(userEntity, userDto);
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
 	public void deleteUser(String userId) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
 		if (userEntity == null)
-			throw new UsernameNotFoundException(userId);
+			throw new UserServiceException(ErrorMessagesEnum.NO_RECORD_FOUND.getErrorMessage());
 
 		userRepository.delete(userEntity);
 	}
@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
 	public UserDto updateUser(String userId, UserDto userDto) {
 		UserEntity userEntity = userRepository.findByUserId(userId);
 		if (userEntity == null)
-			throw new UsernameNotFoundException(userId);
+			throw new UserServiceException(ErrorMessagesEnum.NO_RECORD_FOUND.getErrorMessage());
 
 		if (userDto.getFirstName()!=null && !userDto.getFirstName().isEmpty())
 			userEntity.setFirstName(userDto.getFirstName());
