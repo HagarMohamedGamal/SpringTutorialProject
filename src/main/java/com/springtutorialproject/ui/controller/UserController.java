@@ -1,5 +1,8 @@
 package com.springtutorialproject.ui.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.springtutorialproject.service.UserService;
@@ -19,18 +23,34 @@ import com.springtutorialproject.ui.model.response.OperationStatusModel;
 import com.springtutorialproject.ui.model.response.RequestOperationStatus;
 import com.springtutorialproject.ui.model.response.UserRest;
 
-@RestController	//to be able to accept http requests
-@RequestMapping("users")	//http://localhost:8080/users
+@RestController // to be able to accept http requests
+@RequestMapping("users") // http://localhost:8080/users
 public class UserController {
-	
+
 	@Autowired
 	UserService userService;
 
+	@GetMapping
+	public List<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "limit", defaultValue = "25") int limit) {
+		if(page>0) page-=1;
+		
+		List<UserDto> userDtoList = userService.getUsers(page, limit);
+		
+		List<UserRest> returnValueList = new ArrayList<>();
+		for (UserDto userDto : userDtoList) {
+			UserRest returnValue = new UserRest();
+			BeanUtils.copyProperties(userDto, returnValue);
+			returnValueList.add(returnValue);
+		}
+		return returnValueList;
+	}
+
 	@GetMapping(path = "/{userId}")
 	public UserRest getUser(@PathVariable String userId) {
-		
+
 		UserDto userDto = userService.findUserByUserId(userId);
-		
+
 		UserRest returnValue = new UserRest();
 		BeanUtils.copyProperties(userDto, returnValue);
 		return returnValue;
@@ -40,12 +60,12 @@ public class UserController {
 	public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) {
 		UserDto userDto = new UserDto();
 		BeanUtils.copyProperties(userDetails, userDto);
-		
+
 		userDto = userService.createUser(userDto);
-		
+
 		UserRest returnValue = new UserRest();
 		BeanUtils.copyProperties(userDto, returnValue);
-		
+
 		return returnValue;
 	}
 
@@ -53,14 +73,15 @@ public class UserController {
 	public UserRest updateUser(@PathVariable String userId, @RequestBody UserDetailsRequestModel userDetails) {
 		UserDto userDto = new UserDto();
 		BeanUtils.copyProperties(userDetails, userDto);
-		
+
 		userDto = userService.updateUser(userId, userDto);
-		
+
 		UserRest returnValue = new UserRest();
 		BeanUtils.copyProperties(userDto, returnValue);
-		
+
 		return returnValue;
 	}
+
 	@DeleteMapping(path = "/{userId}")
 	public OperationStatusModel deleteUser(@PathVariable String userId) {
 		OperationStatusModel returnValue = new OperationStatusModel();
@@ -69,5 +90,5 @@ public class UserController {
 		returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
 		return returnValue;
 	}
-	
+
 }
