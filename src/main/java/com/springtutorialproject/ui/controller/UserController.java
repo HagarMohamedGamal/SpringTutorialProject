@@ -2,12 +2,14 @@ package com.springtutorialproject.ui.controller;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -118,7 +120,7 @@ public class UserController {
 	}
 
 	@GetMapping(path = "/{userId}/addresses/{addressId}")
-	public AddressRest getUserAddresse(@PathVariable String userId, @PathVariable String addressId) {
+	public EntityModel<AddressRest> getUserAddresse(@PathVariable String userId, @PathVariable String addressId) {
 
 		AddressDto addressDto = addressService.getAddress(addressId);
 
@@ -126,14 +128,15 @@ public class UserController {
 		AddressRest returnValue = modelMapper.map(addressDto, AddressRest.class);
 
 		Link user = WebMvcLinkBuilder.linkTo(UserController.class).slash(userId).withRel("user");
-		returnValue.add(user);
+//		returnValue.add(user);
 		Link userAddresses = WebMvcLinkBuilder.linkTo(UserController.class).slash(userId).slash("addresses")
 				.withRel("userAddresses");
-		returnValue.add(userAddresses);
+//		returnValue.add(userAddresses);
 		Link self = WebMvcLinkBuilder.linkTo(UserController.class).slash(userId).slash("addresses").slash(addressId)
 				.withRel("self");
-		returnValue.add(self);
-		return returnValue;
+//		returnValue.add(self);
+		return EntityModel.of(returnValue, Arrays.asList(user, userAddresses, self));
+//		return returnValue;
 	}
 
 }
