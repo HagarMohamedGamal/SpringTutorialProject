@@ -1,9 +1,11 @@
 package com.springtutorialproject.ui.controller;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,20 +18,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.springtutorialproject.service.AddressService;
 import com.springtutorialproject.service.UserService;
+import com.springtutorialproject.shared.dto.AddressDto;
 import com.springtutorialproject.shared.dto.UserDto;
 import com.springtutorialproject.ui.model.request.RequestOperationName;
 import com.springtutorialproject.ui.model.request.UserDetailsRequestModel;
+import com.springtutorialproject.ui.model.response.AddressRest;
 import com.springtutorialproject.ui.model.response.OperationStatusModel;
 import com.springtutorialproject.ui.model.response.RequestOperationStatus;
 import com.springtutorialproject.ui.model.response.UserRest;
-
 @RestController // to be able to accept http requests
 @RequestMapping("users") // http://localhost:8080/users
 public class UserController {
 
 	@Autowired
 	UserService userService;
+	
+	@Autowired
+	AddressService addressService;
 
 	@GetMapping
 	public List<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "0") int page,
@@ -91,6 +98,18 @@ public class UserController {
 		returnValue.setOperationName(RequestOperationName.DELETE.name());
 		userService.deleteUser(userId);
 		returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+		return returnValue;
+	}
+
+	@GetMapping(path = "/{userId}/addresses")
+	public List<AddressRest> getUserAddresses(@PathVariable String userId) {
+
+		List<AddressDto> addressDtoList = addressService.getAddressesByUserId(userId);
+		
+		Type listType = new TypeToken<List<AddressRest>>() {}.getType();
+		ModelMapper modelMapper = new ModelMapper();
+		List<AddressRest> returnValue  = modelMapper.map(addressDtoList, listType);
+		
 		return returnValue;
 	}
 
