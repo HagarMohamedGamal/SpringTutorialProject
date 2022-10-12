@@ -8,6 +8,8 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,23 +30,25 @@ import com.springtutorialproject.ui.model.response.AddressRest;
 import com.springtutorialproject.ui.model.response.OperationStatusModel;
 import com.springtutorialproject.ui.model.response.RequestOperationStatus;
 import com.springtutorialproject.ui.model.response.UserRest;
+
 @RestController // to be able to accept http requests
 @RequestMapping("users") // http://localhost:8080/users
 public class UserController {
 
 	@Autowired
 	UserService userService;
-	
+
 	@Autowired
 	AddressService addressService;
 
 	@GetMapping
 	public List<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "limit", defaultValue = "25") int limit) {
-		if(page>0) page-=1;
-		
+		if (page > 0)
+			page -= 1;
+
 		List<UserDto> userDtoList = userService.getUsers(page, limit);
-		
+
 		List<UserRest> returnValueList = new ArrayList<>();
 		for (UserDto userDto : userDtoList) {
 			UserRest returnValue = new UserRest();
@@ -59,10 +63,9 @@ public class UserController {
 
 		UserDto userDto = userService.findUserByUserId(userId);
 
-		
 		ModelMapper modelMapper = new ModelMapper();
-		UserRest returnValue  = modelMapper.map(userDto, UserRest.class);
-		
+		UserRest returnValue = modelMapper.map(userDto, UserRest.class);
+
 		return returnValue;
 	}
 
@@ -70,11 +73,11 @@ public class UserController {
 	public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) {
 
 		ModelMapper modelMapper = new ModelMapper();
-		UserDto userDto  = modelMapper.map(userDetails, UserDto.class);
-		
+		UserDto userDto = modelMapper.map(userDetails, UserDto.class);
+
 		userDto = userService.createUser(userDto);
 
-		UserRest returnValue  = modelMapper.map(userDto, UserRest.class);
+		UserRest returnValue = modelMapper.map(userDto, UserRest.class);
 
 		return returnValue;
 	}
@@ -105,22 +108,31 @@ public class UserController {
 	public List<AddressRest> getUserAddresses(@PathVariable String userId) {
 
 		List<AddressDto> addressDtoList = addressService.getAddressesByUserId(userId);
-		
-		Type listType = new TypeToken<List<AddressRest>>() {}.getType();
+
+		Type listType = new TypeToken<List<AddressRest>>() {
+		}.getType();
 		ModelMapper modelMapper = new ModelMapper();
-		List<AddressRest> returnValue  = modelMapper.map(addressDtoList, listType);
-		
+		List<AddressRest> returnValue = modelMapper.map(addressDtoList, listType);
+
 		return returnValue;
 	}
 
 	@GetMapping(path = "/{userId}/addresses/{addressId}")
-	public AddressRest getUserAddresse(@PathVariable String addressId) {
+	public AddressRest getUserAddresse(@PathVariable String userId, @PathVariable String addressId) {
 
 		AddressDto addressDto = addressService.getAddress(addressId);
 
 		ModelMapper modelMapper = new ModelMapper();
-		AddressRest returnValue  = modelMapper.map(addressDto, AddressRest.class);
-		
+		AddressRest returnValue = modelMapper.map(addressDto, AddressRest.class);
+
+		Link user = WebMvcLinkBuilder.linkTo(UserController.class).slash(userId).withRel("user");
+		returnValue.add(user);
+		Link userAddresses = WebMvcLinkBuilder.linkTo(UserController.class).slash(userId).slash("addresses")
+				.withRel("userAddresses");
+		returnValue.add(userAddresses);
+		Link self = WebMvcLinkBuilder.linkTo(UserController.class).slash(userId).slash("addresses").slash(addressId)
+				.withRel("self");
+		returnValue.add(self);
 		return returnValue;
 	}
 
