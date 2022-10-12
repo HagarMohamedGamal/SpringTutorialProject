@@ -1,13 +1,16 @@
 package com.springtutorialproject.entities;
 
 import java.io.Serializable;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
-@Entity(name="users")
+@Entity(name = "users")
 public class UserEntity implements Serializable {
 
 	private static final long serialVersionUID = 771557813761448648L;
@@ -18,24 +21,30 @@ public class UserEntity implements Serializable {
 
 	@Column(nullable = false)
 	private String userId;
-	
+
 	@Column(nullable = false, length = 50)
 	private String firstName;
-	
+
 	@Column(nullable = false, length = 50)
 	private String lastName;
-	
+
 	@Column(nullable = false, length = 150, unique = true)
 	private String email;
-	
+
 	@Column(nullable = false)
 	private String encryptedPassword;
-	
+
 	private String emailVerificationToken;
-	
-	/* columnDefinition = "boolean default false" not portable across different database versions*/
+
+	/*
+	 * columnDefinition = "boolean default false" not portable across different
+	 * database versions
+	 */
 	@Column(nullable = false)
-	private Boolean emailVerificationStatus=false;
+	private Boolean emailVerificationStatus = false;
+
+	@OneToMany(mappedBy = "userDetails", cascade = { CascadeType.ALL })
+	private List<AddressEntity> addresses;
 
 	public long getId() {
 		return id;
@@ -105,5 +114,12 @@ public class UserEntity implements Serializable {
 		return serialVersionUID;
 	}
 
-	
+	public List<AddressEntity> getAddresses() {
+		return addresses;
+	}
+
+	public void setAddresses(List<AddressEntity> addresses) {
+		this.addresses = addresses;
+	}
+
 }
