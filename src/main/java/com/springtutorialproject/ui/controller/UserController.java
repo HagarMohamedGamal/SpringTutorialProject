@@ -127,13 +127,13 @@ public class UserController {
 		ModelMapper modelMapper = new ModelMapper();
 		AddressRest returnValue = modelMapper.map(addressDto, AddressRest.class);
 
-		Link user = WebMvcLinkBuilder.linkTo(UserController.class).slash(userId).withRel("user");
+		Link user = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class).getUser(userId)).withRel("user");
 //		returnValue.add(user);
-		Link userAddresses = WebMvcLinkBuilder.linkTo(UserController.class).slash(userId).slash("addresses")
+		Link userAddresses = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class).getUserAddresses(userId))
 				.withRel("userAddresses");
 //		returnValue.add(userAddresses);
-		Link self = WebMvcLinkBuilder.linkTo(UserController.class).slash(userId).slash("addresses").slash(addressId)
-				.withRel("self");
+		Link self = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class).getUserAddresse(userId, addressId))
+				.withSelfRel();
 //		returnValue.add(self);
 		return EntityModel.of(returnValue, Arrays.asList(user, userAddresses, self));
 //		return returnValue;
