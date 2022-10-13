@@ -116,9 +116,14 @@ public class UserController {
 		}.getType();
 		ModelMapper modelMapper = new ModelMapper();
 		List<AddressRest> returnValue = modelMapper.map(addressDtoList, listType);
+		for (AddressRest addressRest : returnValue) {
+			Link userAddress = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
+					.getUserAddresse(userId, addressRest.getAddressId())).withSelfRel();
+			addressRest.add(userAddress);
+		}
 		Link user = WebMvcLinkBuilder.linkTo(UserController.class).slash("users").slash(userId).withRel("user");
-		Link userAddresses = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class).getUserAddresses(userId))
-				.withSelfRel();
+		Link userAddresses = WebMvcLinkBuilder
+				.linkTo(WebMvcLinkBuilder.methodOn(UserController.class).getUserAddresses(userId)).withSelfRel();
 		return CollectionModel.of(returnValue, user, userAddresses);
 	}
 
@@ -130,12 +135,15 @@ public class UserController {
 		ModelMapper modelMapper = new ModelMapper();
 		AddressRest returnValue = modelMapper.map(addressDto, AddressRest.class);
 
-		Link user = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class).getUser(userId)).withRel("user");
+		Link user = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class).getUser(userId))
+				.withRel("user");
 //		returnValue.add(user);
-		Link userAddresses = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class).getUserAddresses(userId))
+		Link userAddresses = WebMvcLinkBuilder
+				.linkTo(WebMvcLinkBuilder.methodOn(UserController.class).getUserAddresses(userId))
 				.withRel("userAddresses");
 //		returnValue.add(userAddresses);
-		Link self = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class).getUserAddresse(userId, addressId))
+		Link self = WebMvcLinkBuilder
+				.linkTo(WebMvcLinkBuilder.methodOn(UserController.class).getUserAddresse(userId, addressId))
 				.withSelfRel();
 //		returnValue.add(self);
 		return EntityModel.of(returnValue, Arrays.asList(user, userAddresses, self));
