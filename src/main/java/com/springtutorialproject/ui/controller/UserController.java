@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -107,7 +108,7 @@ public class UserController {
 	}
 
 	@GetMapping(path = "/{userId}/addresses")
-	public List<AddressRest> getUserAddresses(@PathVariable String userId) {
+	public CollectionModel<AddressRest> getUserAddresses(@PathVariable String userId) {
 
 		List<AddressDto> addressDtoList = addressService.getAddressesByUserId(userId);
 
@@ -115,8 +116,10 @@ public class UserController {
 		}.getType();
 		ModelMapper modelMapper = new ModelMapper();
 		List<AddressRest> returnValue = modelMapper.map(addressDtoList, listType);
-
-		return returnValue;
+		Link user = WebMvcLinkBuilder.linkTo(UserController.class).slash("users").slash(userId).withRel("user");
+		Link userAddresses = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class).getUserAddresses(userId))
+				.withSelfRel();
+		return CollectionModel.of(returnValue, user, userAddresses);
 	}
 
 	@GetMapping(path = "/{userId}/addresses/{addressId}")
