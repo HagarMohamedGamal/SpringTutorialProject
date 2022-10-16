@@ -44,4 +44,8 @@ public interface UserRepository extends PagingAndSortingRepository<UserEntity, L
 	@Query(value = "select user from UserEntity user where u.userId = :userId")
 	UserEntity findUserEntityByUserId(@Param("userId") String userId);
 
+	@Query(value = "select user.firstName, user.lastName from UserEntity user where user.userId = :userId")
+	List<Object[]> findUserFirstNameAndLastNameByUserId(@Param("userId") String userId);
+
+
 }
