@@ -13,6 +13,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,6 +37,7 @@ import com.springtutorialproject.ui.model.response.UserRest;
 
 @RestController // to be able to accept http requests
 @RequestMapping("users") // http://localhost:8080/users
+@CrossOrigin(origins = "*"/* {"http://localhost:8083"} */)
 public class UserController {
 
 	@Autowired
@@ -45,6 +47,7 @@ public class UserController {
 	AddressService addressService;
 
 	@GetMapping
+	/* @CrossOrigin(origins = {"http://localhost:8083"}) */
 	public List<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "limit", defaultValue = "25") int limit) {
 		if (page > 0)
