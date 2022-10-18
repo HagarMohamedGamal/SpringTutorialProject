@@ -37,7 +37,7 @@ import com.springtutorialproject.ui.model.response.UserRest;
 
 @RestController // to be able to accept http requests
 @RequestMapping("users") // http://localhost:8080/users
-@CrossOrigin(origins = "*"/* {"http://localhost:8083"} */)
+//@CrossOrigin(origins = "*"/* {"http://localhost:8083"} */)
 public class UserController {
 
 	@Autowired
