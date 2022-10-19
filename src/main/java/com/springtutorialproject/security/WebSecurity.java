@@ -1,5 +1,7 @@
 package com.springtutorialproject.security;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,6 +11,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.springtutorialproject.service.UserService;
 
@@ -36,7 +40,9 @@ public class WebSecurity {
 		AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
 		http.authenticationManager(authenticationManager);
 //		AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManagerBuilder.class).getOrBuild();
-		http.csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, SecurityConstants.SING_UP_URL)
+		http
+		.cors().and()
+		.csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, SecurityConstants.SING_UP_URL)
 				.permitAll().anyRequest().authenticated().and()
 				.addFilter(getAuthenticationFilter(authenticationManager))
 				.addFilter(new AuthorizationFilter(authenticationManager))
@@ -49,6 +55,19 @@ public class WebSecurity {
 		AuthenticationFilter filter = new AuthenticationFilter(authenticationManager);
 		filter.setFilterProcessesUrl("/users/login");
 		return filter;
+	}
+	
+	@Bean
+	public CorsConfiguration  corsConfiguration() {
+		final CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOrigins(Arrays.asList("*"));//Or add list of origins
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));//Or Arrays.asList("*")
+		configuration.setAllowCredentials(true);//It could be cookies or authorization headers or ssl client certificates
+		configuration.setAllowedHeaders(Arrays.asList("*"));//Or Arrays.asList("Authorization", "Cache-Control", "Content-Type")
+		
+		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();//uses URL path patterns to select the CorsConfiguration for a request
+		source.registerCorsConfiguration("/**", configuration); //ot any specific path
+		return configuration;
 	}
 
 //
