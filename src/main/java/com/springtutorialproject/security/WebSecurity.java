@@ -41,13 +41,20 @@ public class WebSecurity {
 		http.authenticationManager(authenticationManager);
 //		AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManagerBuilder.class).getOrBuild();
 		http
-		.cors().and()
-		.csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, SecurityConstants.SING_UP_URL)
-				.permitAll().anyRequest().authenticated().and()
-				.addFilter(getAuthenticationFilter(authenticationManager))
-				.addFilter(new AuthorizationFilter(authenticationManager))
-				.sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		.cors()
+		.and()
+		.csrf().disable()
+		.authorizeRequests()
+		.antMatchers(HttpMethod.POST, SecurityConstants.SING_UP_URL)
+		.permitAll()
+		.antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**")
+		.permitAll()
+		.anyRequest().authenticated()
+		.and()
+		.addFilter(getAuthenticationFilter(authenticationManager))
+		.addFilter(new AuthorizationFilter(authenticationManager))
+		.sessionManagement()
+		.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		return http.build();
 	}
 
