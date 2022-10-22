@@ -35,6 +35,9 @@ import com.springtutorialproject.ui.model.response.OperationStatusModel;
 import com.springtutorialproject.ui.model.response.RequestOperationStatus;
 import com.springtutorialproject.ui.model.response.UserRest;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+
 @RestController // to be able to accept http requests
 @RequestMapping("users") // http://localhost:8080/users
 //@CrossOrigin(origins = "*"/* {"http://localhost:8083"} */)
@@ -46,6 +49,9 @@ public class UserController {
 	@Autowired
 	AddressService addressService;
 
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "authorization", paramType = "header", value = "Bearer JWTtoken")
+	})
 	@GetMapping
 	/* @CrossOrigin(origins = {"http://localhost:8083"}) */
 	public List<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "0") int page,
