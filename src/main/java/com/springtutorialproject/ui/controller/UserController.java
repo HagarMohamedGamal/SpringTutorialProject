@@ -37,6 +37,7 @@ import com.springtutorialproject.ui.model.response.UserRest;
 
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 
 @RestController // to be able to accept http requests
 @RequestMapping("users") // http://localhost:8080/users
@@ -70,6 +71,8 @@ public class UserController {
 		return returnValueList;
 	}
 
+	@ApiOperation(value = "Get User Details Web Service Endpoint",
+			notes = "This web service endpoint returns User Details. User's public user id in URL path. For example : /users/ufh37rnju478")
 	@GetMapping(path = "/{userId}")
 	public UserRest getUser(@PathVariable String userId) {
 
